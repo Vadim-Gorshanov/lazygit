@@ -133,6 +133,13 @@ func (self *BranchCommands) GetGraphCmdObj(branchName string) oscommands.ICmdObj
 	return self.cmd.New(str.ToArgv(resolvedTemplate)).DontLog()
 }
 
+func (self *BranchCommands) GetFullGraphCmdObj() oscommands.ICmdObj {
+	return self.cmd.New(NewGitCmd("log").Arg("--graph", "--color=always", 
+			"--abbrev-commit", "--decorate", "--date=relative", "--pretty=medium",
+			"--oneline", "--all").
+		ToArgv()).DontLog()
+}
+
 func (self *BranchCommands) SetCurrentBranchUpstream(remoteName string, remoteBranchName string) error {
 	cmdArgs := NewGitCmd("branch").
 		Arg(fmt.Sprintf("--set-upstream-to=%s/%s", remoteName, remoteBranchName)).

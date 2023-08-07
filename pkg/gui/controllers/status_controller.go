@@ -3,13 +3,9 @@ package controllers
 import (
 	"errors"
 	"fmt"
-	"strings"
-	"time"
 
 	"github.com/jesseduffield/lazygit/pkg/commands/types/enums"
-	"github.com/jesseduffield/lazygit/pkg/constants"
 	"github.com/jesseduffield/lazygit/pkg/gui/presentation"
-	"github.com/jesseduffield/lazygit/pkg/gui/style"
 	"github.com/jesseduffield/lazygit/pkg/gui/types"
 	"github.com/samber/lo"
 )
@@ -69,24 +65,19 @@ func (self *StatusController) GetKeybindings(opts types.KeybindingsOpts) []*type
 
 func (self *StatusController) GetOnRenderToMain() func() error {
 	return func() error {
-		dashboardString := strings.Join(
-			[]string{
-				lazygitTitle(),
-				"Copyright 2022 Jesse Duffield",
-				fmt.Sprintf("Keybindings: %s", constants.Links.Docs.Keybindings),
-				fmt.Sprintf("Config Options: %s", constants.Links.Docs.Config),
-				fmt.Sprintf("Tutorial: %s", constants.Links.Docs.Tutorial),
-				fmt.Sprintf("Raise an Issue: %s", constants.Links.Issues),
-				fmt.Sprintf("Release Notes: %s", constants.Links.Releases),
-				style.FgMagenta.Sprintf("Become a sponsor: %s", constants.Links.Donate), // caffeine ain't free
-			}, "\n\n")
+		return self.c.Helpers().Diff.WithDiffModeCheck(func() error {
+			var task types.UpdateTask
+			cmdObj := self.c.Git().Branch.GetFullGraphCmdObj()
 
-		return self.c.RenderToMainViews(types.RefreshMainOpts{
-			Pair: self.c.MainViewPairs().Normal,
-			Main: &types.ViewUpdateOpts{
-				Title: self.c.Tr.StatusTitle,
-				Task:  types.NewRenderStringTask(dashboardString),
-			},
+			task = types.NewRunPtyTask(cmdObj.GetCmd())
+
+			return self.c.RenderToMainViews(types.RefreshMainOpts{
+				Pair: self.c.MainViewPairs().Normal,
+				Main: &types.ViewUpdateOpts{
+					Title: self.c.Tr.LogTitle,
+					Task:  task,
+				},
+			})
 		})
 	}
 }
