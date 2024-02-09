@@ -3,6 +3,7 @@ package controllers
 import (
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/jesseduffield/lazygit/pkg/commands/types/enums"
 	"github.com/jesseduffield/lazygit/pkg/gui/presentation"
